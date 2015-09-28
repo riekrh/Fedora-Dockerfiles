@@ -1,0 +1,11 @@
+[Unit]
+Description=The Apache HTTP Server for TEMPLATE
+After=docker.service
+
+[Service]
+ExecStart=/usr/bin/docker start TEMPLATE
+ExecStop=/usr/bin/docker stop TEMPLATE
+ExecReload=/usr/bin/docker exec -t TEMPLATE /usr/sbin/httpd $OPTIONS -k graceful
+
+[Install]
+WantedBy=multi-user.target
