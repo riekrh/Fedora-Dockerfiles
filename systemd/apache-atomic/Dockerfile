@@ -19,6 +19,14 @@ EXPOSE 80
 
 RUN echo "systemd httpd server" > /var/www/html/index.html
 
+#
+# Workaround for BZ 1046469
+# When running more than one container with systemd and invoked with "--privileged", the agetty process will burn 100% of a cpu.
+# Udev and getty can either be disabled in each running container, or simply be removed here.
+#
+RUN rm -f /lib/systemd/system/systemd*udev* ; \
+    rm -f /lib/systemd/system/getty.target;
+
 LABEL INSTALL="docker run --rm --privileged -v /:/host -e HOST=/host -e LOGDIR=${LOGDIR} -e CONFDIR=${CONFDIR} -e DATADIR=${DATADIR} -e IMAGE=IMAGE -e NAME=NAME IMAGE /bin/install.sh"
 LABEL UNINSTALL="docker run --rm --privileged -v /:/host -e HOST=/host -e IMAGE=IMAGE -e NAME=NAME IMAGE /bin/uninstall.sh"
 LABEL RUN="docker run -v /sys/fs/cgroup:/sys/fs/cgroup -v /var/log/${NAME}/httpd:/var/log/httpd:Z -v /var/lib/${NAME}:/var/lib/httpd:Z --init=systemd --name NAME IMAGE"
